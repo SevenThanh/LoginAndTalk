@@ -4,43 +4,40 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { useSelectedUser } from "@/store/useSelectedUser";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { useQuery } from "@tanstack/react-query";
-// import { getMessages } from "@/actions/message.actions";
+import { getMessages } from "@/actions/message.actions";
 import { useEffect, useRef } from "react";
 import { messages, USERS } from "@/db/dummy";
 
 // import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 const MessageList = () => {
-	// const { selectedUser } = useSelectedUser();
-	// const { user: currentUser, isLoading: isUserLoading } = useKindeBrowserClient();
+	const { selectedUser } = useSelectedUser();
+	const { user: currentUser, isLoading: isUserLoading } = useKindeBrowserClient();
 	const messageContainerRef = useRef<HTMLDivElement>(null);
-	const isMessagesLoading = true;
-	const selectedUser = USERS[0];
-	const currentUser= USERS[1];
 
-	// const { data: messages, isLoading: isMessagesLoading } = useQuery({
-	// 	queryKey: ["messages", selectedUser?.id],
-	// 	queryFn: async () => {
-	// 		if (selectedUser && currentUser) {
-	// 			return await getMessages(selectedUser?.id, currentUser?.id);
-	// 		}
-	// 	},
-	// 	enabled: !!selectedUser && !!currentUser && !isUserLoading,
-	// });
+	const { data: messages, isLoading: isMessagesLoading } = useQuery({
+		queryKey: ["messages", selectedUser?.id],
+		queryFn: async () => {
+			if (selectedUser && currentUser) {
+				return await getMessages(selectedUser?.id, currentUser?.id);
+			}
+		},
+		enabled: !!selectedUser && !!currentUser && !isUserLoading,
+	});
 
-	// Scroll to the bottom of the message container when new messages are added
-	// useEffect(() => {
-	// 	if (messageContainerRef.current) {
-	// 		messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-	// 	}
-	// }, [messages]);
+
+	useEffect(() => {
+		if (messageContainerRef.current) {
+			messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+		}
+	}, [messages]);
 
 	return (
 		<div ref={messageContainerRef} className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
 			{/* This component ensure that an animation is applied when items are added to or removed from the list */}
 			<AnimatePresence>
 				{isMessagesLoading &&
-					messages.map((message, index) => (
+					messages?.map((message, index) => (
 						<motion.div
 							key={index}
 							layout
@@ -61,14 +58,14 @@ const MessageList = () => {
 							}}
 							className={cn(
 								"flex flex-col gap-2 p-4 whitespace-pre-wrap",
-								message.senderId === currentUser.id ? "items-end" : "items-start"
+								message.senderId === currentUser?.id ? "items-end" : "items-start"
 							)}
 						>
 							<div className='flex gap-3 items-center'>
-								{message.senderId === selectedUser.id && (
+								{message.senderId === selectedUser?.id && (
 									<Avatar className='flex justify-center items-center'>
 										<AvatarImage
-											src={selectedUser.image}
+											src={selectedUser?.image}
 											alt='User Image'
 											className='border-2 border-white rounded-full'
 										/>
@@ -84,10 +81,10 @@ const MessageList = () => {
 									/>
 								)}
 
-								{message.senderId === currentUser.id && (
+								{message.senderId === currentUser?.id && (
 									<Avatar className='flex justify-center items-center'>
 										<AvatarImage
-											src={currentUser.image}
+											src={currentUser?.picture || "/user-placeholder.png"}
 											alt='User Image'
 											className='border-2 border-white rounded-full'
 										/>

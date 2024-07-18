@@ -9,12 +9,12 @@ const ChatTopBar = () => {
 			<div className='flex items-center gap-2'>
 				<Avatar className='flex justify-center items-center'>
 					<AvatarImage
-						src={selectedUser.image || "/user-placeholder.png"}
+						src={selectedUser?.image || "/user-placeholder.png"}
 						alt='User Image'
 						className='w-10 hs-10 object-cover rounded-full'
 					/>
 				</Avatar>
-				<span className='font-medium'>{selectedUser.name}</span>
+				<span className='font-medium'>{selectedUser?.name}</span>
 			</div>
 
 			<div className='flex gap-2'>

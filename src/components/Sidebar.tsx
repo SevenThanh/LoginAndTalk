@@ -37,12 +37,16 @@ const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
 
 			<ScrollArea className='gap-2 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
 				{/* Ensure users is defined before mapping over it */}
-				{USERS.map((user, idx) =>
+				{users.map((user, idx) =>
 					isCollapsed ? (
 						<TooltipProvider key={idx}>
 							<Tooltip delayDuration={0}>
 								<TooltipTrigger asChild>
 									<div
+										onClick={() => {
+											soundEnabled && playClickSound();
+											setSelectedUser(user);
+										}}
 									>
 										<Avatar className='my-1 flex justify-center items-center'>
 											<AvatarImage
