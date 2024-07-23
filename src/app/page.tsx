@@ -26,7 +26,9 @@ async function getUsers(): Promise<User[]> {
 
 	const users: User[] = [];
 	for (const user of results) {
-		users.push(user);
+		// if (user.id !== currentUser?.id) {
+			users.push(user);
+		// }
 	}
 	return users;
 }
@@ -51,7 +53,7 @@ export default async function Home() {
 			/>
 
 			<div className='z-10 border rounded-lg max-w-5xl w-full min-h-[85vh] text-sm lg:flex'>
-				<ChatLayout defaultLayout={defaultLayout} users={USERS} />
+				<ChatLayout defaultLayout={defaultLayout} users={users} />
 			</div>
 		</main>
 	);

@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import React from 'react'
 import AuthButtons from './AuthButtons'
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";

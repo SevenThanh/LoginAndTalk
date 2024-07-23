@@ -7,8 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/actions/message.actions";
 import { useEffect, useRef } from "react";
 import { messages, USERS } from "@/db/dummy";
-
-// import MessageSkeleton from "../skeletons/MessageSkeleton";
+import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 const MessageList = () => {
 	const { selectedUser } = useSelectedUser();
@@ -36,7 +35,7 @@ const MessageList = () => {
 		<div ref={messageContainerRef} className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
 			{/* This component ensure that an animation is applied when items are added to or removed from the list */}
 			<AnimatePresence>
-				{isMessagesLoading &&
+				{!isMessagesLoading &&
 					messages?.map((message, index) => (
 						<motion.div
 							key={index}
@@ -96,9 +95,9 @@ const MessageList = () => {
 
 				{isMessagesLoading && (
 					<>
-						{/* <MessageSkeleton />
 						<MessageSkeleton />
-						<MessageSkeleton /> */}
+						<MessageSkeleton />
+						<MessageSkeleton />
 					</>
 				)}
 			</AnimatePresence>
