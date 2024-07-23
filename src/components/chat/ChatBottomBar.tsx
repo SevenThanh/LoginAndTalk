@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef} from 'react'
+import { useState, useRef, useEffect} from 'react'
 import { Image as ImageIcon, Loader, SendHorizontal, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from 'framer-motion';
 import { Textarea } from '../ui/textarea';
@@ -14,19 +14,29 @@ import { useSelectedUser } from "@/store/useSelectedUser";
 import { CldUploadWidget, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
 import Image from "next/image";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { pusherClient } from "@/lib/pusher";
+import { Message } from "@/db/dummy";
+
 
 const ChatBottomBar = () => {
-  const { selectedUser } = useSelectedUser();
+
   const [message, setMessage] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { soundEnabled } = usePreferences();
   const [imgUrl, setImgUrl] = useState("");
+  const { selectedUser } = useSelectedUser();
+  const { user: currentUser } = useKindeBrowserClient();
+  const queryClient = useQueryClient();
 
 
 	const [playSound1] = useSound("/sounds/keystroke1.mp3");
 	const [playSound2] = useSound("/sounds/keystroke2.mp3");
 	const [playSound3] = useSound("/sounds/keystroke3.mp3");
 	const [playSound4] = useSound("/sounds/keystroke4.mp3");
+
+	const [playNotificationSound] = useSound("/sounds/notification.mp3");
+
 
   const playSoundFunctions = [playSound1, playSound2, playSound3, playSound4];
 
@@ -60,6 +70,28 @@ const ChatBottomBar = () => {
 		}
 	};
   
+
+	useEffect(() => {
+		const channelName = `${currentUser?.id}__${selectedUser?.id}`.split("__").sort().join("__");
+		const channel = pusherClient?.subscribe(channelName);
+
+		const handleNewMessage = (data: { message: Message }) => {
+			queryClient.setQueryData(["messages", selectedUser?.id], (oldMessages: Message[]) => {
+				return [...oldMessages, data.message];
+			});
+
+			if (soundEnabled && data.message.senderId !== currentUser?.id) {
+				playNotificationSound();
+			}
+		};
+
+		channel.bind("newMessage", handleNewMessage);
+
+    return () => {
+			channel.unbind("newMessage", handleNewMessage);
+			pusherClient.unsubscribe(channelName);
+		};
+	}, [currentUser?.id, selectedUser?.id, queryClient, playNotificationSound, soundEnabled]);
 
 	return (
 		<div className='p-2 flex justify-between w-full items-center gap-2'>
